@@ -30,9 +30,15 @@ NumIterations=[100000]
 RunType=[4096]
 
 
-[tlb_test]
-AppSizeArg=[]
-NumIterations=[1000]
+[tlb_skylake]
+AppSizeArg=[63, 120]
+NumIterations=[100000]
+RunType=[4096]
+
+
+[tlb_ben]
+AppSizeArg=[47, 90]
+NumIterations=[100000]
 RunType=[4096]
 
 [arrandale]

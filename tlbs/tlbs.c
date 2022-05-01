@@ -21,10 +21,10 @@
 //#define PRINT_ARRAY
 #define PRINT_SCRIPT_FRIENDLY
 
-//force benchmark to run for some minimum wall-clock time
+// force benchmark to run for some minimum wall-clock time
 // advantages: hopefully smoothes out noise of tests that run too quickly
 // disadvantages: adds additional code to critical loop (empirically unnoticable)
-#define USE_MIN_TIME
+// #define USE_MIN_TIME
 //min time is in (seconds)
 #ifndef __riscv
 #define MIN_TIME (1.0)
@@ -179,6 +179,7 @@ arr_elem_t threadMain()
 
     //TODO time code ahead of time, and set num_iterations based on that...
 #ifdef USE_MIN_TIME
+    // fprintf(stderr, "threadMain critical section 1\n");
     // run for g_num_iterations or until MIN_TIME reached, whichever comes last
     cctime_t volatile start_time = cc_get_seconds(clk_freq);
     cctime_t volatile estimated_end_time = start_time + MIN_TIME;
@@ -205,6 +206,7 @@ arr_elem_t threadMain()
 
 #else
 
+    // fprintf(stderr, "threadMain critical section 2\n");
     // run for g_num_iterations...
     cctime_t volatile start_time = cc_get_seconds(clk_freq);
 

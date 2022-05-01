@@ -1,16 +1,16 @@
 #/bin/bash
 # "runall.sh" script runs through all $TESTS, either on local machine if RUN_LOCAL=1, or on
-# a list of remote machines otherwise. 
+# a list of remote machines otherwise.
 
-# **** NOTE: ASSUMES RUNNING ON MAC OS X, with matplotlib installed **** 
+# **** NOTE: ASSUMES RUNNING ON MAC OS X, with matplotlib installed ****
 # - If local, opens the generated plots (only works on OS X using the "open" command).
 # - If remote, runs tests remotely, then pulls report.txt file to the local
 #     machine, plots data locally, and then opens pdf file on local machine.
-#     Assumes remote machine doesn't have matplotlib for plotting, so that 
+#     Assumes remote machine doesn't have matplotlib for plotting, so that
 #     work is done locally.
 
 # comment out the necessary steps in the code below if your machine doesn't
-# support the above operations. 
+# support the above operations.
 
 
 
@@ -26,7 +26,7 @@ INPUTSIZE="small"
 #INPUTSIZE="riscv"
 
 # Information for running on the local machine
-local_proc="unknown"         
+local_proc="unknown"
 architecture="x86"
 
 # Information for running on remote host machines
@@ -52,7 +52,7 @@ then
       plot_name=plot_${test}_${local_proc}_${time_stamp}
       echo " "
       echo "*****************************************************************"
-      echo "RUNNING TEST: " $test "  " $time_stamp  " : " 
+      echo "RUNNING TEST: " $test "  " $time_stamp  " : "
       echo "*****************************************************************"
       echo " "
       echo $@
