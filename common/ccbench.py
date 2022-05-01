@@ -2,7 +2,7 @@
 
 # Author: Christopher Celio
 # Date  : 2011 May 15
-#   
+#
 # All common Python routines needed by the run_tests.py go in here.  In
 # particular, command-line argument parsing, input file parsing, running the
 # benchmarks, storing results to an output file, and parsing the output file
@@ -17,7 +17,7 @@ from subprocess import PIPE  # now we can make system calls
 import optparse    # parse CLI options
 import os
 
-from datetime import datetime 
+from datetime import datetime
 
 
 # This function takes Bash commands and returns them
@@ -25,9 +25,9 @@ def runBash(cmd):
     p = Popen(cmd, shell=True, stdout=PIPE)
     out = p.stdout.read().strip()
     return out #This is the stdout from the shell command
- 
-                                       
-# This function takes in a line from a file, and a search string, and returns 
+
+
+# This function takes in a line from a file, and a search string, and returns
 # the string between the nearest [,] delineators that follow the str
 #   thus,       "Cycles=[1234]" returns "1234"
 def parseValueFromLine(line, str):
@@ -36,9 +36,9 @@ def parseValueFromLine(line, str):
     end_idx = value.find("]")
     value = value[srt_idx : end_idx]
     return value.strip()
-                                      
 
-# This function takes in a line from a file, and a search string, and returns 
+
+# This function takes in a line from a file, and a search string, and returns
 # the an numerical array between the nearest [,] delineators that follow the str
 #   thus,       "Cycles=[1,2,3,4]" returns "[1,2,3,4]" (the list, not the str)
 #
@@ -51,32 +51,32 @@ def parseIntArrayFromLine(line, str):
     line = line[srt_idx : end_idx] # 1,2,3,4
 
     colon_idx = line.find(":")
-    
+
     if colon_idx != -1:
         # run function generator
         # (this code should be re-factored to scale to more operators...)
-        
+
         fcn_idx = line.find("+")
-        if fcn_idx != -1: 
+        if fcn_idx != -1:
             start_num   = int(line[0:colon_idx])
             end_num     = int(line[colon_idx+1:fcn_idx-1])
             inc_num     = int(line[fcn_idx+1:])
-            
+
             new_num = start_num
-            
+
             while (new_num <= end_num):
                 arr.append(new_num)
                 new_num += inc_num
-        
+
         else:
             fcn_idx = line.find("*")
             if fcn_idx == -1: print "Unsupported Operator... let's pretend it's \"*\"..."
             start_num   = int(line[0:colon_idx])
             end_num     = int(line[colon_idx+1:fcn_idx-1])
             inc_num     = int(line[fcn_idx+1:])
-            
+
             new_num = start_num
-            
+
             while (new_num <= end_num):
                 arr.append(new_num)
                 new_num *= inc_num
@@ -89,10 +89,10 @@ def parseIntArrayFromLine(line, str):
             arr.append(int(line[: com_idx]))
             line = line[com_idx+1:]
             com_idx = line.find(",")
-        
+
         #handle last number
         arr.append(int(line))
-    
+
     return arr
 
 
@@ -121,9 +121,9 @@ def arrayToStr(array):
             else:
                 string += (str(array[i]))
         return string
- 
 
- 
+
+
 #Function to control option parsing in Python
 def controller():
     global VERBOSE
@@ -133,12 +133,12 @@ def controller():
     global PLOT_FILENAME
     global NOPLOT
     # select which processor we're graphing (sets the title and other incidentals and sometimes invoke options).
-    global PROCESSOR        
+    global PROCESSOR
     # select which processor architecture we're targetting (sets the
     # compiler/build options, as well as how to run the binary on the target machine).
     # Essentially, ARCHITECTURE is the ISA and PROCESSOR is the micro-architecture.
     global ARCHITECTURE
-    
+
     #create instance of Option Parser Module, included in Standard Library
     p = optparse.OptionParser(description='CLI Controller for memory system u-kernels',
                   prog='./run_test.py',
@@ -169,7 +169,7 @@ def controller():
                   help='prints verbosely (currently unused)',
                   default = False)
 
-    #option Handling passes correct parameter to runBash 
+    #option Handling passes correct parameter to runBash
     options, arguments = p.parse_args()
     NORUN          = options.norun
     INPUT_TYPE     = options.input_type
@@ -184,17 +184,17 @@ def controller():
 # 1. Parse inputs file
 def parseInputFile(input_filename, variables, input_type):
 
-    input_file = open(input_filename).readlines() 
-        
+    input_file = open(input_filename).readlines()
+
     inputs = {}
-        
+
     # scan for input_type first
     found_input_type = False
     # mark when we're finished reading params from input_type
     input_finished = False
 
     for line in input_file:
-            
+
         #already captured the inputs we wanted
         if input_finished:
             continue
@@ -203,16 +203,16 @@ def parseInputFile(input_filename, variables, input_type):
         idx = (line.strip()).find("#")
         if idx == 0:
             continue
-            
+
         #handle input_type shenanigans... <pistol whip>
         if found_input_type == False:
-            idx = line.find("[")  
+            idx = line.find("[")
             if (idx == 0) and (INPUT_TYPE in line):
                 found_input_type = True
             else:
                 continue
         else:
-            idx = line.find("[")  
+            idx = line.find("[")
             if (idx == 0):
                 input_finished = True
                 continue
@@ -225,12 +225,12 @@ def parseInputFile(input_filename, variables, input_type):
                 continue
 
     return inputs
-                
-         
+
+
 
 # app_args is a list of strings, where each string corresponds to a single run to the application binary
 def runBenchmark(app_bin, app_args_list, inputs, input_variables, report_filename):
-     
+
     # import the architecture-specific functions
     import sys
     sys.path.append('../arch/' + ARCHITECTURE)
@@ -242,11 +242,11 @@ def runBenchmark(app_bin, app_args_list, inputs, input_variables, report_filenam
     # but the issue is how can the graphing stuff know how many
     # data points exist by just looking at the report file.
     num_dp_per_set   = inputs["NumDataPointsPerSet"][0]
-                                        
+
     # Execute Test
     t = datetime.now()
     time_str = t.strftime("%Y-%m-%d %H:%M:%S")
-    # re-creates the input file text for the report file ... 
+    # re-creates the input file text for the report file ...
 
     input_str = ''
     for var in input_variables:
@@ -255,10 +255,10 @@ def runBenchmark(app_bin, app_args_list, inputs, input_variables, report_filenam
     runBash("echo \"#" + report_filename + "\n# " + time_str  \
                 + "\n# input type: [" + INPUT_TYPE + "]\n" + input_str \
                 + "\n\n# Added automatically by ccbench.py for the graphing code.\n" \
-                + "# The '@' sign lets the parser zero in on special notes to the grapher" \
-                + ":\n@NumDataPointsPerSet=[" + str(num_dp_per_set) +  "]\n" 
+                # + "# The '@' sign lets the parser zero in on special notes to the grapher" \
+                # + ":\n@NumDataPointsPerSet=[" + str(num_dp_per_set) +  "]\n"
                 + "\" > " + report_filename)
-                 
+
     for app_args in app_args_list:
         architecture.runBenchmark(PROCESSOR, app_bin, app_args, report_filename)
 
@@ -269,7 +269,7 @@ def readReportFile(report_filename, variables):
 
     # 3. Extract Data
     file = open(report_filename).readlines() #open the file
-        
+
     # "data" is a 1D dictionary, indexed by Variable.
     data = {}  # Ordered Dict not in Python 2.6 :(
 
@@ -277,7 +277,7 @@ def readReportFile(report_filename, variables):
     #initialize arrays
     for variable in variables:
         data[variable] = []
-        
+
     #one program run per line
     #App:[stencil3],NumThreads:[1],AppSizeArg:[32],Time(s):[55.000000]
     for line in file:
@@ -300,15 +300,15 @@ def readReportFile(report_filename, variables):
             if variable in line:
                 data[variable].append(parseValueFromLine(line, variable))
 
-
+    print "debugging data:", data
     return data
- 
+
 # returns inputs from the report file in dictionary form (I think)
 def parseReportFileForInputs(report_filename, input_variables):
 
     # 3. Extract Data
     file = open(report_filename).readlines() #open the file
-        
+
     # "data" is a 1D dictionary, indexed by Variable.
     inputs = {}  # Ordered Dict not in Python 2.6 :(
 
@@ -329,15 +329,19 @@ def parseReportFileForInputs(report_filename, input_variables):
     return inputs
 
 def getReportFileName(app_str, report_dir_path):
+    print "debugging report_filename", REPORT_FILENAME
+    print "debugging norun", NORUN
     if (REPORT_FILENAME == "none"):
         if (NORUN):
-            # if norun, plot using the lastest report_filename 
-                report_filename = \
-                    getMostRecentReportFile("/" + app_str + "/" + report_dir_path)
-        else:   
+            # if norun, plot using the lastest report_filename
+            report_filename = \
+                getMostRecentReportFile("/" + app_str + "/" + report_dir_path)
+            print "debugging report_filename", report_filename
+        else:
             report_filename = generateReportFileName(app_str)
-    else:   
+    else:
         report_filename = os.path.basename(REPORT_FILENAME)
+    print "debugging test", report_filename
     return report_filename
 
 
@@ -354,7 +358,7 @@ def generatePlotFileName(app_str):
 
 def getMostRecentReportFile(report_dir_path):
     files = runBash("ls -t ../" + report_dir_path)
-    files + "\n"
+    files = files + "\n"
     #print files
     idx = files.find("\n")
     #print idx
@@ -364,7 +368,7 @@ def getMostRecentReportFile(report_dir_path):
 
 
 
-                
+
 #This idiom means the below code only runs when executed from the command line
 if __name__ == '__main__':
   print '--Error: ccbench.py is an include file--'

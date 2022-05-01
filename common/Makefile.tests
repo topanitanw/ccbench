@@ -6,8 +6,6 @@ SOURCES 	 += ../common/cctimer.c ../common/barrier.c ../common/cclfsr.c
 
 OBJECTS ?= $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(SOURCES) ) ) )
 
-
-
 # customize the build based on the architecture
 #
 #include ../arch/$(ARCH)/Makefile.mk
@@ -24,19 +22,21 @@ else
 	include ../arch/generic/Makefile.mk
 endif
 
+# CFLAGS+= -DDEBUG -DPRINT_ARRAY
 
 # Build targets
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	if $(foreach source,$(OBJECTS),[ $(source) -nt $(TARGET) ] ||) 1; \
-	then $(CC) $(CFLAGS) $^ -o $@ $(LD_FLAGS) $(LD_LIBS); \
+	if $(foreach source,$(OBJECTS),[ $(source) -nt $(TARGET) ] ||) 1; then \
+		$(CC) $(CFLAGS) $^ -o $@ $(LD_FLAGS) $(LD_LIBS); \
 	fi
 
 run: $(TARGET)
 	./$(TARGET) $(APP_FLAGS)
 
-
-clean:
+clean: clean_rp
 	-rm -f *.o *.d ../common/*.o $(TARGET)
 
+clean_rp:
+	-rm -f reports/* plots/*

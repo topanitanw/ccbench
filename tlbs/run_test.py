@@ -21,7 +21,7 @@ import os
 import ccbench
 import ccprocstats
 
-APP = "caches"
+APP = "tlbs"
 BASE_DIR="./"
 REPORT_DIR=BASE_DIR + "reports/"
 PLOT_DIR=BASE_DIR + "plots/"
@@ -125,7 +125,6 @@ def main():
 
 
     # 4. Plot the Data
-    #print data
 
     if NOPLOT:
         return
@@ -144,8 +143,8 @@ def main():
     p1 = fig.add_subplot(1,1,1)
 
     print "Plotting time..."
-    num_datapoints = int(data["NumDataPointsPerSet"][0])
-
+    num_datapoints = 1 #int(data["NumDataPointsPerSet"][0])
+    print "num data point:", num_datapoints
     # let's convert "appsizearg(#elm)" to "appsize(KB)"
     for i in range(len(data["AppSize"])):
         data["AppSize"][i] = str(float(data["AppSize"][i]) * 4 / 1024)
